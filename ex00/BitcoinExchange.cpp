@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 16:23:14 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/19 14:24:10 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/19 14:37:19 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,8 +156,10 @@ void	process_line(std::string &line)
 	std::string word[4];
 	int i = 0;
 
-	while (i < 4 && iss >> word[i++])
-	{}
+	while (i < 4 && iss >> word[i])
+	{
+		i++;
+	}
 	if (i != 3)
 	{
 		std::cerr << "Wrong number of argument, usage: 'YYYY-MM-DD | {integer|decimal}'" << std::endl;
