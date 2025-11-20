@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 16:23:14 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/20 13:16:56 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/20 14:51:39 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,18 +173,18 @@ time_t	check_date(std::string date)
 	return (check_validity(tokens[0], tokens[1], tokens[2]));
 }
 
-double	check_value(std::string &value)
+double	check_value(std::string &value, bool is_conf)
 {
 	char	*endptr;
 	double	fnb;
 
-	fnb = std::strtof(value.c_str(), &endptr);
+	fnb = std::strtod(value.c_str(), &endptr);
 	if (endptr != &value.c_str()[value.size()])
 	{
 		std::cout << "Error: must be a number: " << value << std::endl;
 		return (-1.0);
 	}
-	if ((errno == ERANGE) || fnb >= 2147483648)
+	if ((errno == ERANGE) || fnb > (is_conf? 2147483648: 1000))
 	{
 		std::cout << "Error: too large number: " << value << std::endl;
 		return(-1.0);
@@ -264,7 +264,7 @@ void	BitcoinExchange::fill_map(std::string &line)
 	timestamp = check_date(word[0]);
 	if (timestamp == -1)
 		throw std::runtime_error("Incorrect line format");
-	value = check_value(word[1]);
+	value = check_value(word[1], true);
 	if (value == -1.0)
 		throw std::runtime_error("Incorrect line format");
 	this->_database[timestamp] = value;
@@ -285,9 +285,9 @@ double	BitcoinExchange::calculate_rate(time_t timestamp, double value) const
 	// 	else
 	// 		rate = pair.first->second;
 	// }
-	if (pair.first == this->_database.end())
-		return (-1.0);
-	rate = pair.first->second;
+	// if (pair.second == this->_database.end())
+	// 	return (-1.0);
+	rate = (--pair.first)->second;
 	return (value * rate);
 }
 
@@ -320,7 +320,7 @@ void	BitcoinExchange::process_line(std::string &line) const
 		std::cout << "Error: bad separator => " << word[1] << std::endl;
 		return;
 	}
-	value = check_value(word[2]);
+	value = check_value(word[2], false);
 	if (value == -1.0)
 		return;
 	value = calculate_rate(timestamp, value);
@@ -329,7 +329,11 @@ void	BitcoinExchange::process_line(std::string &line) const
 		std::cout << "Error: No data yet for that date: " << word[1] << std::endl;
 		return;
 	}
-	std::cout << word[0] << " => " << word[2] << " = " << value << std::endl;
+	std::cout << word[0] << " => " << word[2] << " = ";
+
+	// std::cout.setf(std::ios::floatfield);
+	std::cout.setf(std::ios::showpoint);
+	std::cout << value << std::endl;
 }
 
 bool check_input_header(const std::string &header)
