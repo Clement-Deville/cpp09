@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 16:23:14 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/19 14:37:19 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/20 13:16:56 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,52 @@
 BitcoinExchange::BitcoinExchange(void)
 {
 }
+
+BitcoinExchange::BitcoinExchange(const std::string &path)
+{
+	std::ifstream	file(path.c_str());
+	std::string		line;
+	int				count = 0;
+
+	if (!file)
+	{
+		std::cout << "Error: could not open file." << std::endl;
+		throw std::runtime_error("BitcoinExchange constructor exception");
+	}
+
+	if (!std::getline(file, line))
+	{
+		if (!file.eof())
+		{
+			std::cout << "Error: could not read file." << std::endl;
+			throw std::runtime_error("BitcoinExchange constructor exception");
+		}
+		throw std::runtime_error("No data extracted");
+	}
+
+	if (!check_csv_header(line))
+		throw std::runtime_error("Incorrect csv header");
+
+	while (file)
+	{
+		if(!std::getline(file, line))
+		{
+			if (!file.eof())
+			{
+				std::cout << "Error: could not read file." << std::endl;
+				throw std::runtime_error("BitcoinExchange constructor exception");
+			}
+		}
+		if (line.empty() || line[0] == '#')
+			continue;
+		fill_map(line);
+		count++;
+	}
+	if (!count)
+		throw std::runtime_error("No data extracted");
+	// print_map();
+}
+
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &Cpy)
 {
@@ -55,129 +101,259 @@ int str_to_int(std::string &str)
 	return (static_cast<int>(nb));
 }
 
-int check_validity(std::string &year, std::string &month, std::string &day)
+time_t check_validity(std::string &year, std::string &month, std::string &day)
 {
 	int	year_nb;
 	int month_nb;
 	int	day_nb;
+	struct tm date;
 
+	std::memset(&date , 0, sizeof(tm));
 	if (year.size() != 4)
-		return (false);
+		return (-1);
 	year_nb = str_to_int(year);
-	if (year_nb == -1)
-		return (false);
+	if (year_nb == -1 || year_nb < 1970)
+		return (-1);
 
 	if (month.size() != 2)
-		return (false);
+		return (-1);
 	month_nb = str_to_int(month);
 	if (month_nb < 1 || month_nb > 12)
-		return (false);
+		return (-1);
 
 	if (day.size() != 2)
-		return (false);
+		return (-1);
 	day_nb = str_to_int(day);
-	if (day_nb < 1 || month_nb > 31)
-		return (false);
+	if (day_nb < 1 || day_nb > 31)
+		return (-1);
 
 	/* Check des mois ayant 31 jours */
 	if (day_nb == 31)
 	{
 		if (month_nb == 4 || month_nb == 6 || month_nb == 9 || month_nb == 11)
-			return (false);
+			return (-1);
 	}
 
 	/* Check special de fevrier et des annees bissextile */
 	if (month_nb == 2)
 	{
 		if (day_nb > 29)
-			return (0);
+			return (-1);
 		if (day_nb == 29)
 		{
-			/* Si l'annee est un multiple de 4 et qu'elle n'est pas un multiple de 100
-				si elle n'est pas un multiple de 400 */
-			if (year_nb % 4 != 0 && (year_nb % 400 == 0 || year_nb % 100 != 0))
-				return (false);
+			/* Si l'annee n'est pas un multiple de 4 ou qu'elle est un multiple de 100
+				sans etre un multiple de 400 */
+			if (year_nb % 4 != 0 || (year_nb % 100 == 0 && year_nb % 400 != 0))
+				return (-1);
 		}
 	}
-	return (true);
+	date.tm_mday = day_nb;
+	date.tm_mon = month_nb -1;
+	date.tm_year = year_nb;
+	return (std::mktime(&date));
 }
 
-int check_date(std::string date)
+time_t	check_date(std::string date)
 {
 	std::string			tokens[4];
 
 	int i = 0;
 	if (date.size() != DATE_SIZE)
-		return (false);
-	if (date[3] != '-' || date[5] != '-')
-		return (false);
-	date[3] = ' ';
-	date[5] = ' ';
+		return (-1);
+	if (date[4] != '-' || date[7] != '-')
+		return (-1);
+	date[4] = ' ';
+	date[7] = ' ';
 
 	std::istringstream	iss(date);
-	while (i < 4 && iss >> tokens[i++])
+	for (;i < 4 && iss >> tokens[i]; i++)
 	{}
 	if (i != 3)
-		return (false);
-	if (check_validity(tokens[0], tokens[1], tokens[2]))
-		return (false);
-	return (true);
+		return (-1);
+	return (check_validity(tokens[0], tokens[1], tokens[2]));
 }
 
-float	check_value(std::string &value)
+double	check_value(std::string &value)
 {
 	char	*endptr;
-	float	fnb;
+	double	fnb;
 
 	fnb = std::strtof(value.c_str(), &endptr);
-	if ((errno == ERANGE) || endptr != &value.c_str()[value.size()])
+	if (endptr != &value.c_str()[value.size()])
 	{
-		std::cerr << "Error: must be a number: " << value << std::endl;
+		std::cout << "Error: must be a number: " << value << std::endl;
 		return (-1.0);
+	}
+	if ((errno == ERANGE) || fnb >= 2147483648)
+	{
+		std::cout << "Error: too large number: " << value << std::endl;
+		return(-1.0);
 	}
 	if (fnb < 0)
 	{
-		std::cerr << "Error: not a positive number: " << value << std::endl;
-		return(-1.0);
-	}
-	if (fnb >= 2147483648)
-	{
-		std::cerr << "Error: too large number: " << value << std::endl;
+		std::cout << "Error: not a positive number: " << value << std::endl;
 		return(-1.0);
 	}
 	return (fnb);
 }
 
-void	process_line(std::string &line)
+std::string format_time(time_t timestamp)
 {
-	float value;
+	std::ostringstream iss;
 
-	std::istringstream iss(line);
-	std::string word[4];
+	struct tm *data;
+	data = std::localtime(&timestamp);
+	iss.fill('0');
+	iss.width(4);
+	iss << data->tm_year << '-';
+	iss.width(2);
+	iss.fill('0');
+	iss << data->tm_mon + 1 << '-';
+	iss.width(2);
+	iss.fill('0');
+	iss << data->tm_mday;
+	return (iss.str());
+}
+
+void	BitcoinExchange::print_map(void) const
+{
+	b_map_t::const_iterator it;
+
+	for (it = this->_database.begin(); it != this->_database.end(); it++)
+	{
+		std::cout << format_time(it->first) << "," << it->second << std::endl;
+	}
+}
+
+bool check_csv_header(const std::string &header)
+{
+	int	ret;
 	int i = 0;
 
-	while (i < 4 && iss >> word[i])
-	{
+	ret = false;
+	while (header[i] && std::isprint(header[i]) && header[i] != ',')
 		i++;
+	if (!i || header[i++] != ',')
+		return (false);
+	if (std::isprint(header[i]) && header[i++] != ',')
+	{
+		while (std::isprint(header[i]) && header[i++] != ',')
+			i++;
+		if (header[i])
+			return (false);
+	}
+	return (true);
+}
+
+void	BitcoinExchange::fill_map(std::string &line)
+{
+	double value;
+	std::string word[3];
+	time_t timestamp;
+	int i = 0;
+
+	if (line.length() < DATE_SIZE + 2 || line[10] != ',')
+		throw std::runtime_error("Incorrect line format");
+	line[10] = ' ';
+	std::istringstream iss(line);
+	for (; i < 3 && iss >> word[i]; i++)
+	{
+	}
+	if (i != 2)
+		throw std::runtime_error("Incorrect line format");
+	timestamp = check_date(word[0]);
+	if (timestamp == -1)
+		throw std::runtime_error("Incorrect line format");
+	value = check_value(word[1]);
+	if (value == -1.0)
+		throw std::runtime_error("Incorrect line format");
+	this->_database[timestamp] = value;
+	// this->_database.insert(std::pair<time_t, double>(timestamp, value));
+}
+
+double	BitcoinExchange::calculate_rate(time_t timestamp, double value) const
+{
+	std::pair<b_map_t::const_iterator,b_map_t::const_iterator> pair;
+	double	rate;
+
+	pair = this->_database.equal_range(timestamp);
+	// if (pair.second != this->_database.end()
+	// 	&& pair.first != this->_database.end())
+	// {
+	// 	if (pair.second->first - timestamp > timestamp - pair.first->first)
+	// 		rate = pair.second->second;
+	// 	else
+	// 		rate = pair.first->second;
+	// }
+	if (pair.first == this->_database.end())
+		return (-1.0);
+	rate = pair.first->second;
+	return (value * rate);
+}
+
+// void	display_line(double value, std::string &line)
+
+void	BitcoinExchange::process_line(std::string &line) const
+{
+	std::istringstream iss(line);
+	std::string word[4];
+	double	value;
+	time_t timestamp;
+	int i = 0;
+
+	for (; i < 4 && iss >> word[i]; i++)
+	{
 	}
 	if (i != 3)
 	{
-		std::cerr << "Wrong number of argument, usage: 'YYYY-MM-DD | {integer|decimal}'" << std::endl;
+		std::cout << "Wrong number of argument, usage: 'YYYY-MM-DD | {integer|decimal}'" << std::endl;
 		return;
 	}
-	if (!check_date(word[0]))
+	timestamp = check_date(word[0]);
+	if (timestamp == -1)
 	{
-		std::cerr << "Error: bad input =>" << word[0] << std::endl;
+		std::cout << "Error: bad input => " << word[0] << std::endl;
 		return;
 	}
 	if (word[1] != "|")
 	{
-		std::cerr << "Error: bad input =>" << word[0] << std::endl;
+		std::cout << "Error: bad separator => " << word[1] << std::endl;
 		return;
 	}
 	value = check_value(word[2]);
 	if (value == -1.0)
 		return;
+	value = calculate_rate(timestamp, value);
+	if (value == -1.0)
+	{
+		std::cout << "Error: No data yet for that date: " << word[1] << std::endl;
+		return;
+	}
+	std::cout << word[0] << " => " << word[2] << " = " << value << std::endl;
+}
+
+bool check_input_header(const std::string &header)
+{
+	int	ret;
+	int i = 0;
+
+	ret = false;
+	while (header[i] && std::isprint(header[i]) && !std::isspace(header[i]))
+	{
+		i++;
+	}
+	if (!i || !std::isspace(header[i++]))
+		return (false);
+	if (header[i++] != '|' || !std::isspace(header[i++]))
+		return (false);
+	if (std::isprint(header[i++]))
+	{
+		while (std::isprint(header[i]))
+			i++;
+		if (header[i])
+			return (false);
+	}
+	return (true);
 }
 
 void BitcoinExchange::parse(const std::string &filename) const
@@ -187,16 +363,26 @@ void BitcoinExchange::parse(const std::string &filename) const
 
 	if (!file)
 	{
-		std::cerr << "Error: could not open file." << std::endl;
+		std::cout << "Error: could not open file." << std::endl;
 		return;
 	}
-
+	if (!std::getline(file, line))
+	{
+		if (!file.eof())
+			std::cout << "Error: could not read file." << std::endl;
+		return;
+	}
+	if (!check_input_header(line))
+	{
+		std::cout << "Error: bad header" << std::endl;
+		return ;
+	}
 	while (file)
 	{
 		if(!std::getline(file, line))
 		{
 			if (!file.eof())
-				std::cerr << "Error: could not read file." << std::endl;
+				std::cout << "Error: could not read file." << std::endl;
 			return;
 		}
 		if (line.empty() || line[0] == '#')

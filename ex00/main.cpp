@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 17:23:43 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/19 12:28:08 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/20 12:51:03 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int main( int ac, char **argv )
 {
-	BitcoinExchange test;
+	BitcoinExchange test("data.csv");
 
 	if (ac != 2)
 	{
