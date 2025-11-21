@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 16:23:14 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/20 14:51:39 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/21 07:48:56 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,30 +268,20 @@ void	BitcoinExchange::fill_map(std::string &line)
 	if (value == -1.0)
 		throw std::runtime_error("Incorrect line format");
 	this->_database[timestamp] = value;
-	// this->_database.insert(std::pair<time_t, double>(timestamp, value));
 }
 
 double	BitcoinExchange::calculate_rate(time_t timestamp, double value) const
 {
-	std::pair<b_map_t::const_iterator,b_map_t::const_iterator> pair;
+	b_map_t::const_iterator it;
 	double	rate;
 
-	pair = this->_database.equal_range(timestamp);
-	// if (pair.second != this->_database.end()
-	// 	&& pair.first != this->_database.end())
-	// {
-	// 	if (pair.second->first - timestamp > timestamp - pair.first->first)
-	// 		rate = pair.second->second;
-	// 	else
-	// 		rate = pair.first->second;
-	// }
-	// if (pair.second == this->_database.end())
-	// 	return (-1.0);
-	rate = (--pair.first)->second;
+	it = this->_database.lower_bound(timestamp);
+	if (it->first == timestamp)
+		return (value * it->second);
+	rate = (--it)->second;
 	return (value * rate);
 }
 
-// void	display_line(double value, std::string &line)
 
 void	BitcoinExchange::process_line(std::string &line) const
 {
@@ -331,8 +321,8 @@ void	BitcoinExchange::process_line(std::string &line) const
 	}
 	std::cout << word[0] << " => " << word[2] << " = ";
 
-	// std::cout.setf(std::ios::floatfield);
-	std::cout.setf(std::ios::showpoint);
+	std::cout << std::fixed;
+	std::cout.precision(2);
 	std::cout << value << std::endl;
 }
 
