@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 16:23:14 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/21 07:58:30 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/21 08:26:58 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,12 +68,14 @@ BitcoinExchange::BitcoinExchange(const std::string &path)
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &Cpy)
 {
-	(void)Cpy;
+	*this = Cpy;
 }
 
 BitcoinExchange & BitcoinExchange::operator=(const BitcoinExchange &Other)
 {
-	(void)Other;
+	if (this == &Other)
+		return (*this);
+	this->_database = Other._database;
 	return (*this);
 }
 
