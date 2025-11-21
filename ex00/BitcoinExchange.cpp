@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 16:23:14 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/21 07:48:56 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/21 07:58:30 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,9 @@ double	BitcoinExchange::calculate_rate(time_t timestamp, double value) const
 	double	rate;
 
 	it = this->_database.lower_bound(timestamp);
-	if (it->first == timestamp)
+	if (it == this->_database.begin())
+		return (-1.0);
+	if (it != this->_database.end() && it->first == timestamp)
 		return (value * it->second);
 	rate = (--it)->second;
 	return (value * rate);
