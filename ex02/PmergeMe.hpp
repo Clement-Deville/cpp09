@@ -1,36 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   PmergeMe.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/26 17:23:43 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/23 12:39:05 by cdeville         ###   ########.fr       */
+/*   Created: 2025/11/23 12:05:17 by cdeville          #+#    #+#             */
+/*   Updated: 2025/11/23 12:39:33 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "PmergeMe.hpp"
+#pragma once
 
-int main( int ac, const char **argv )
-{
-	std::deque<int> *test;
-	
-	if (ac < 2)
-	{
-		std::cerr << "Error" <<std::endl;
-		return (1);
-	}
+#include "iostream"
+#include <deque>
+#include <string>
+#include <sstream>
+#include <cstdlib>
+#include <limits>
 
-	try {
-		test = parse_argument(ac, argv);
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << "Error" << std::endl;
-		return (1);
-	}
-	print_sequence(test, "Before:");
-	delete test;
-	return (0);
-}
+std::deque<int> *parse_argument(int argc, const char *argv[]);
+void	print_sequence(std::deque<int> *to_print, const char *message);
