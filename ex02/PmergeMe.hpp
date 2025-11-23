@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 12:05:17 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/23 15:27:22 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:45:50 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ struct PmergeMe
 	std::deque<int> lowers;
 };
 
-std::deque<int> *parse_argument(int argc, const char *argv[]);
-void	print_sequence(std::deque<int> *to_print, const char *message);
-void	generate_pairs(std::deque<int> &arg, PmergeMe &data);
-void	merge_sort(std::deque<int> &arg);
+void	parse_argument(int argc, const char *argv[],
+		std::deque<int> &parsed_nbs);
+void	print_sequence(std::deque<int> &to_print, const char *message);
+void	generate_pairs(std::deque<int> &uper, std::deque<int> &lowers);
+void	merge_sort(std::deque<int> &uper);
