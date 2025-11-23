@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 12:05:57 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/23 12:41:08 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/23 15:35:44 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,4 +56,79 @@ std::deque<int> *parse_argument(int argc, const char *argv[])
 		parsed_nbs->push_back(number);
 	}
 	return (parsed_nbs);
+}
+
+void	generate_pairs(std::deque<int> &arg, PmergeMe &data)
+{
+	std::deque<int>::const_iterator it;
+	int								a;
+	int								b;
+
+	for (it = arg.begin(); it != arg.end(); it++)
+	{
+		a = *it;
+		if (++it == arg.end())
+		{
+			data.lowers.push_back(a);
+			break;
+		}
+		b = *it;
+		if (a < b)
+			std::swap(a, b);
+		data.upers.push_back(a);
+		data.lowers.push_back(b);
+	}
+}
+
+void	sort_small(std::deque<int> &arg)
+{
+	switch (arg.size())
+	{
+	case 3:
+		if (arg[0] < arg[1])
+		{
+			if (arg[1] < arg[2]) /* 1 2 3 */
+				return;
+			else
+			{
+				if (arg[2] > arg[0]) /* 1 3 2 */
+					std::swap(arg[1], arg[2]);
+				else /* 2 3 1 */
+				{
+					std::swap(arg[0], arg[1]);
+					std::swap(arg[0], arg[2]);
+				}
+			}
+		}
+		else /* arg[0] > arg[1] */
+		{
+			if (arg[0] < arg[2]) /* 2 1 3*/
+				std::swap(arg[0], arg[1]);
+			else
+			{
+				if (arg[1] > arg[2]) /* 3 2 1 */
+					std::swap(arg[0], arg[2]);
+				else /* 2 3 1 */
+				{
+					std::swap(arg[0], arg[1]);
+					std::swap(arg[1], arg[2]);
+				}
+			}
+		}
+		break;
+		case 2:
+		{
+			if (arg[0] > arg[1])
+				std::swap(arg[1], arg[0]);
+			break;
+		}
+	default:
+		break;
+	}
+}
+
+void	merge_sort(std::deque<int> &arg)
+{
+	if (arg.size() <= 3)
+		sort_small(arg);
 }
