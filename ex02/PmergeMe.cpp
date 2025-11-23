@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 12:05:57 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/23 16:51:24 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/23 22:44:30 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,109 +52,82 @@ void parse_argument(int argc, const char *argv[], std::deque<int> &parsed_nbs)
 	}
 }
 
-// void	generate_pairs(std::deque<int> &uper, std::deque<int> &lowers)
-// {
-// 	std::deque<int>::const_iterator it;
-// 	int								a;
-// 	int								b;
 
-// 	for (it = uper.begin(); it != uper.end(); it++)
-// 	{
-// 		a = *it;
-// 		if (++it == uper.end())
-// 		{
-// 			lowers.push_back(a);
-// 			break;
-// 		}
-// 		b = *it;
-// 		if (a < b)
-// 			std::swap(a, b);
-// 		data.upers.push_back(a);
-// 		data.lowers.push_back(b);
-// 	}
-// }
-
-void	generate_pairs(std::deque<int> &uper, std::deque<int> &lowers)
+void	swap(int a, int b, int deepness, std::deque<int> &data)
 {
-	int a;
-	int b;
-	int remainder = -1;
+	int offset;
 
-	if (uper.size() % 2)
+	std::swap(data[a], data[b]);
+	if (deepness == 0)
+		return ;
+	for (int i = deepness; i > 0; i--)
 	{
-		remainder = uper[uper.size() - 1];
-		uper.pop_back();
+		offset = data.size() / std::pow(2, deepness);
+		swap(a + offset, b + offset, deepness - 1, data);
 	}
-	for (std::size_t i = 0; i < uper.size(); i += 2)
-	{
-		a = uper[i];
-		b = uper[i + 1];
-		if (a < b)
-			std::swap(a, b);
-		uper[i / 2] = a;
-		lowers.push_back(b);
-	}
-	if (remainder != -1)
-		lowers.push_back(remainder);
-	uper.erase(uper.begin() + (uper.size() / 2), uper.end());
 }
 
-void	sort_small(std::deque<int> &uper, std::deque<int> lower)
+void	insert(int src_index,
+				int dest_index,
+				int deepness,
+				std::deque<int> &data)
 {
-	switch (uper.size())
+	int	offset;
+	int	tmp;
+
+	tmp = data[src_index];
+	data.erase(data.begin() + src_index);
+	data.insert(data.begin() + dest_index, tmp);
+	if (deepness == 0)
+		return;
+	for (int i = deepness; i > 0; i--)
+	{
+		offset = data.size() / std::pow(2, deepness);
+		insert(src_index + offset,
+				dest_index + offset, deepness - 1, data);
+	}
+}
+
+void	sort_small(std::deque<int> &data, int deepness)
+{
+	switch (data.size())
 	{
 	case 3:
-		if (uper[0] < uper[1])
+		if (data[0] < data[1])
 		{
-			if (uper[1] < uper[2]) /* 1 2 3 */
+			if (data[1] < data[2]) /* 1 2 3 */
 				return;
 			else
 			{
-				if (uper[2] > uper[0]) /* 1 3 2 */
-				{
-					std::swap(uper[1], uper[2]);
-					std::swap(lower[1], lower[2]);
-				}
+				if (data[2] > data[0]) /* 1 3 2 */
+					swap(1, 2, deepness, data);
 				else /* 2 3 1 */
 				{
-					std::swap(uper[0], uper[1]);
-					std::swap(uper[0], uper[2]);
-					std::swap(lower[0], lower[1]);
-					std::swap(lower[0], lower[2]);
+					swap(0, 1, deepness, data);
+					swap(0, 2, deepness, data);
 				}
 			}
 		}
 		else /* arg[0] > arg[1] */
 		{
-			if (uper[0] < uper[2]) /* 2 1 3*/
-			{
-				std::swap(uper[0], uper[1]);
-				std::swap(lower[0], lower[1]);
-			}
+			if (data[0] < data[2]) /* 2 1 3*/
+				swap(0, 1, deepness, data);
 			else
 			{
-				if (uper[1] > uper[2]) /* 3 2 1 */
-				{
-					std::swap(uper[0], uper[2]);
-					std::swap(lower[0], lower[2]);
-				}
+				if (data[1] > data[2]) /* 3 2 1 */
+					swap(0, 2, deepness, data);
 				else /* 2 3 1 */
 				{
-					std::swap(uper[0], uper[1]);
-					std::swap(uper[1], uper[2]);
-					std::swap(lower[0], lower[1]);
-					std::swap(lower[1], lower[2]);
+					swap(0, 1, deepness, data);
+					swap(1, 2, deepness, data);
 				}
 			}
 		}
 		break;
 		case 2:
 		{
-			if (uper[0] > uper[1])
-			{
-				std::swap(uper[1], uper[0]);
-				std::swap(lower[1], lower[0]);
-			}
+			if (data[0] > data[1])
+				swap(1, 0, deepness, data);
 			break;
 		}
 	default:
@@ -162,19 +135,38 @@ void	sort_small(std::deque<int> &uper, std::deque<int> lower)
 	}
 }
 
-void	insert_lowers(std::deque<int> &uper, std::deque<int> &lowers)
+void	swap_upers(std::deque<int> &data, int deepness)
 {
-	
+	int offset;
+	int
+
+	offset = data.size() / std::pow(2, deepness + 1);
+	for (int i = 0; i < offset; i++)
+	{
+		if (data[i] < data[i + offset])
+			swap(i, i + offset, deepness, data);
+	}
 }
 
-void	merge_sort(std::deque<int> &uper)
+void	process_insertion(std::deque<int> &data, int deepness)
 {
-	std::deque<int> lowers;
+	int	offset;
+	int	to_insert;
 
-	if (uper.size() <= 3)
+	offset =  data.size() / std::pow(2, deepness + 1);
+	to_insert = data.size() / std::pow(2, deepness); - offset - 1;
+	insert(0 + offset, 0, deepness, data);
+	// to smartly match index of remainings
+}
+
+void	merge_sort(std::deque<int> &data, int deepness)
+{
+	if (data.size() / (std::pow(2, deepness)) < 4)
 	{
-		sort_small(uper, lowers);
+		sort_small(data, deepness);
 		return;
 	}
-	generate_pairs(uper, lowers);
+	swap_upers(data, deepness);
+	merge_sort(data, deepness + 1);
+	process_insertion(data, deepness);
 }
