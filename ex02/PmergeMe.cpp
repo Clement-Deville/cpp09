@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 12:05:57 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/24 11:42:00 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/24 16:15:38 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,14 @@ void	swap(int a, int b, int deepness, std::deque<int> &data)
 	int offset;
 
 	std::swap(data[a], data[b]);
+	std::cout << "swap(" << a << " , " << b << ") deepness " << deepness << std::endl;
+
 	if (deepness == 0)
 		return ;
 	for (int i = deepness; i > 0; i--)
 	{
-		offset = data.size() >> deepness;
-		swap(a + offset, b + offset, deepness - 1, data);
+		offset = data.size() >> i;
+		swap(a + offset, b + offset, i - 1, data);
 	}
 }
 
@@ -90,6 +92,7 @@ void	insert(int src_index,
 
 void	sort_small(std::deque<int> &data, int deepness)
 {
+	std::cout << "=== SORT SMALL === " << std::endl;
 	switch (data.size() >> deepness)
 	{
 	case 3:
@@ -133,6 +136,7 @@ void	sort_small(std::deque<int> &data, int deepness)
 	default:
 		break;
 	}
+	std::cout << "=== SORT SMALL END === " << std::endl;
 }
 
 void	swap_upers(std::deque<int> &data, int deepness)
