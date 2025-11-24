@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 12:05:57 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/23 22:44:30 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/24 11:42:00 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	swap(int a, int b, int deepness, std::deque<int> &data)
 		return ;
 	for (int i = deepness; i > 0; i--)
 	{
-		offset = data.size() / std::pow(2, deepness);
+		offset = data.size() >> deepness;
 		swap(a + offset, b + offset, deepness - 1, data);
 	}
 }
@@ -82,7 +82,7 @@ void	insert(int src_index,
 		return;
 	for (int i = deepness; i > 0; i--)
 	{
-		offset = data.size() / std::pow(2, deepness);
+		offset = data.size() >> deepness;
 		insert(src_index + offset,
 				dest_index + offset, deepness - 1, data);
 	}
@@ -90,7 +90,7 @@ void	insert(int src_index,
 
 void	sort_small(std::deque<int> &data, int deepness)
 {
-	switch (data.size())
+	switch (data.size() >> deepness)
 	{
 	case 3:
 		if (data[0] < data[1])
@@ -138,9 +138,8 @@ void	sort_small(std::deque<int> &data, int deepness)
 void	swap_upers(std::deque<int> &data, int deepness)
 {
 	int offset;
-	int
 
-	offset = data.size() / std::pow(2, deepness + 1);
+	offset = data.size() >> (deepness + 1);
 	for (int i = 0; i < offset; i++)
 	{
 		if (data[i] < data[i + offset])
@@ -148,20 +147,68 @@ void	swap_upers(std::deque<int> &data, int deepness)
 	}
 }
 
+void	set_next_range(int &index, int &n, int &range, int &to_insert)
+{
+	range = (1 << n) - range;
+	if (to_insert < range)
+		range = to_insert;
+	index += range;
+}
+
+int	binary_search(std::deque<int> &data, int value, int index, int start)
+{
+	(void)index;
+	int	step = (start + 1) >> 1; /* divinding by 2 */
+	while (step)
+	{
+		if (data[start] < value)
+			start += step;
+		else
+			start -= step;
+		step >>= 1;
+	}
+	return (data[start] < value ? start + 1 : start);
+}
+
+void	insert_lower_range(std::deque<int> &data, int index, int range, int deepness)
+{
+	int	target;
+	int	offset;
+
+	offset =  (index - range) / 2;
+	for (int i = 0; i < range; i++)
+	{
+		target = binary_search(data, data[index], index, offset);
+		insert(index, target, deepness, data);
+	}
+}
+
 void	process_insertion(std::deque<int> &data, int deepness)
 {
 	int	offset;
 	int	to_insert;
+	int	range = 0;
+	int	n = 1;
+	int	index;
 
-	offset =  data.size() / std::pow(2, deepness + 1);
-	to_insert = data.size() / std::pow(2, deepness); - offset - 1;
+	offset =  data.size() >> (deepness + 1);
+	to_insert = (data.size() >> deepness) - offset - 1;
+	index = offset;
 	insert(0 + offset, 0, deepness, data);
+	while (to_insert)
+	{
+		set_next_range(index, n, range, to_insert);
+		// if (range > to_insert)
+		// 	range = to_insert;
+		insert_lower_range(data, index, range, deepness);
+		to_insert -= range;
+	}
 	// to smartly match index of remainings
 }
 
 void	merge_sort(std::deque<int> &data, int deepness)
 {
-	if (data.size() / (std::pow(2, deepness)) < 4)
+	if ((data.size() >> deepness) < 4)
 	{
 		sort_small(data, deepness);
 		return;

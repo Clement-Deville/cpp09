@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 17:23:43 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/23 22:14:46 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/11/24 09:03:06 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,17 @@ int main( int ac, const char **argv )
 		std::cerr << "Error" <<std::endl;
 		return (1);
 	}
+
+	// int index = 0;
+	// int	range = 0;
+	// int n = 1;
+
+	// while (n < 10)
+	// {
+	// 	set_next_range(index, n , range);
+	// 	std::cout << "Index: " << index << " n: " << n << " range: " << range << std::endl;
+	// 	n++;
+	// }
 
 	try {
 		parse_argument(ac, argv, test);
