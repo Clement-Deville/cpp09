@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 12:05:57 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/24 19:43:28 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/12/09 15:55:47 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,54 +77,6 @@ void	insert(int src_index,
 }
 
 template <typename T>
-void	sort_small(T &data, int deepness)
-{
-	switch (data.size() >> deepness)
-	{
-	case 3:
-		if (data[0] < data[1])
-		{
-			if (data[1] < data[2]) /* 1 2 3 */
-				return;
-			else
-			{
-				if (data[2] > data[0]) /* 1 3 2 */
-					swap(1, 2, deepness, data);
-				else /* 2 3 1 */
-				{
-					swap(0, 1, deepness, data);
-					swap(0, 2, deepness, data);
-				}
-			}
-		}
-		else /* arg[0] > arg[1] */
-		{
-			if (data[0] < data[2]) /* 2 1 3*/
-				swap(0, 1, deepness, data);
-			else
-			{
-				if (data[1] > data[2]) /* 3 2 1 */
-					swap(0, 2, deepness, data);
-				else /* 2 3 1 */
-				{
-					swap(0, 1, deepness, data);
-					swap(1, 2, deepness, data);
-				}
-			}
-		}
-		break;
-		case 2:
-		{
-			if (data[0] > data[1])
-				swap(1, 0, deepness, data);
-			break;
-		}
-	default:
-		break;
-	}
-}
-
-template <typename T>
 void	swap_upers(T &data, int deepness)
 {
 	int offset;
@@ -186,11 +138,9 @@ void	process_insertion(T &data, int deepness)
 template <typename T>
 void	merge_sort(T &data, int deepness)
 {
-	if ((data.size() >> deepness) < 4)
-	{
-		sort_small(data, deepness);
+
+	if ((data.size() >> deepness) == 1)
 		return;
-	}
 	swap_upers(data, deepness);
 	merge_sort(data, deepness + 1);
 	process_insertion(data, deepness);
