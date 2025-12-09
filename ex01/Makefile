@@ -6,7 +6,7 @@
 #    By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 16:23:30 by cdeville          #+#    #+#              #
-#    Updated: 2025/11/21 10:08:09 by cdeville         ###   ########.fr        #
+#    Updated: 2025/12/09 16:28:58 by cdeville         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME=RPN
 
 CC=c++
 
-CFLAGS= -Wall -Werror -Wextra -std=c++98 -ggdb -glldb
+CFLAGS= -Wall -Werror -Wextra -std=c++98 -g
 
 DEBUG = -g
 

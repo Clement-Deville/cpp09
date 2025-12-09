@@ -6,7 +6,7 @@
 #    By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 16:23:30 by cdeville          #+#    #+#              #
-#    Updated: 2025/11/23 12:36:18 by cdeville         ###   ########.fr        #
+#    Updated: 2025/12/09 15:59:05 by cdeville         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME=PmergeMe
 
 CC=c++
 
-CFLAGS= -Wall -Werror -Wextra -std=c++98 -ggdb
+CFLAGS= -Wall -Werror -Wextra -std=c++98
 
 DEBUG = -g
 

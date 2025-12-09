@@ -6,7 +6,7 @@
 #    By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 16:23:30 by cdeville          #+#    #+#              #
-#    Updated: 2025/11/19 14:25:02 by cdeville         ###   ########.fr        #
+#    Updated: 2025/12/09 15:58:55 by cdeville         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME=btc
 
 CC=c++
 
-CFLAGS= -Wall -Werror -Wextra -std=c++98 -ggdb -glldb
+CFLAGS= -Wall -Werror -Wextra -std=c++98
 
 DEBUG = -g
 

@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 16:23:14 by cdeville          #+#    #+#             */
-/*   Updated: 2025/11/21 08:26:58 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/12/09 15:59:48 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,10 +229,8 @@ void	BitcoinExchange::print_map(void) const
 
 bool check_csv_header(const std::string &header)
 {
-	int	ret;
 	int i = 0;
 
-	ret = false;
 	while (header[i] && std::isprint(header[i]) && header[i] != ',')
 		i++;
 	if (!i || header[i++] != ',')
@@ -332,10 +330,8 @@ void	BitcoinExchange::process_line(std::string &line) const
 
 bool check_input_header(const std::string &header)
 {
-	int	ret;
 	int i = 0;
 
-	ret = false;
 	while (header[i] && std::isprint(header[i]) && !std::isspace(header[i]))
 	{
 		i++;
