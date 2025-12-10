@@ -6,7 +6,7 @@
 /*   By: cdeville <cdeville@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 12:05:17 by cdeville          #+#    #+#             */
-/*   Updated: 2025/12/09 15:56:03 by cdeville         ###   ########.fr       */
+/*   Updated: 2025/12/10 09:00:13 by cdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <deque>
+#include <vector>
 #include <string>
 #include <sstream>
 #include <cstdlib>
